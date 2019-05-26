@@ -3,6 +3,7 @@ package kvetinac97.Game;
 import cn.nukkit.Player;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.item.Item;
+import cn.nukkit.network.protocol.SetSpawnPositionPacket;
 import cn.nukkit.scheduler.Task;
 import kvetinac97.MinigameBase;
 import kvetinac97.Object.PlayerData;
@@ -34,8 +35,8 @@ public class GameSchedule extends Task {
                         pl.getPlayer().sendPopup("§7Cekani na hrace...");
                     });
 
-                if (time > 10 && game.getLivingPlayerCount() >= 4) //zrychlení hry
-                    time = 10;
+                if (time > 20 && game.getLivingPlayerCount() >= 4) //zrychlení hry
+                    time = 20;
 
                 game.getPlayers().forEach((name, pl) -> {
                     Player player = pl.getPlayer();
@@ -75,6 +76,31 @@ public class GameSchedule extends Task {
                     MinigameBase.goldPlayerPos.forEach((pos -> {
                         game.getBase().getServer().getDefaultLevel().dropItem(pos, Item.get(Item.GOLD_INGOT, 0, 1));
                     }));
+                }
+
+                //Kompas pro vraha
+                if (game.getLivingPlayerCount() == 1){
+                    SetSpawnPositionPacket packet = new SetSpawnPositionPacket();
+                    for (PlayerData pl : game.getPlayers().values())
+                        if (!pl.isMurderer() && pl.getPlayer().getGamemode() == 2){
+                            Player p = pl.getPlayer();
+                            packet.x = (int) p.x;
+                            packet.y = (int) p.y;
+                            packet.z = (int) p.z;
+                            break;
+                        }
+
+                    packet.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
+
+                    for (PlayerData pl : game.getPlayers().values())
+                        if (pl.isMurderer()) {
+                            if (pl.getPlayer().getInventory().getItem(2).getId() != Item.COMPASS)
+                                pl.getPlayer().getInventory().setItem(2, Item.get(Item.COMPASS, 0, 1)
+                                        .setCustomName("§r§bPosledni hrac"), true);
+
+                            pl.getPlayer().dataPacket(packet);
+                            break;
+                        }
                 }
 
                 if (time == 0){

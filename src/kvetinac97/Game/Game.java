@@ -78,29 +78,6 @@ public class Game {
         }));
 
         players.values().forEach(px -> px.showScoreboard(getLivingPlayerCount()));
-
-        //Kompas pro vraha
-        if (getLivingPlayerCount() == 1){
-            SetSpawnPositionPacket packet = new SetSpawnPositionPacket();
-            for (PlayerData pl : players.values())
-                if (!pl.isMurderer()){
-                    Player p = pl.getPlayer();
-                    packet.x = (int) p.x;
-                    packet.y = (int) p.y;
-                    packet.z = (int) p.z;
-                    break;
-                }
-
-            packet.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
-
-            for (PlayerData pl : players.values())
-                if (pl.isMurderer()) {
-                    pl.getPlayer().getInventory().setItem(2, Item.get(Item.COMPASS, 0, 1)
-                            .setCustomName("§r§bPosledni hrac"), true);
-                    pl.getPlayer().dataPacket(packet);
-                    break;
-                }
-        }
     }
 
     //Konec hry
@@ -165,35 +142,11 @@ public class Game {
             packet.z = (int) player.z;
             packet.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
 
-            for (PlayerData pl : players.values()){
-                if (!pl.isMurderer())
+            for (PlayerData pl : players.values())
+                if (!pl.isMurderer()) {
                     pl.getPlayer().getInventory().setItem(2, Item.get(Item.COMPASS, 0, 1)
                             .setCustomName("§r§bLuk detektiva"), true);
-
-                pl.getPlayer().dataPacket(packet);
-            }
-        }
-
-        //poslední nevinný
-        if (getLivingPlayerCount() == 1){
-            SetSpawnPositionPacket packet = new SetSpawnPositionPacket();
-            for (PlayerData pl : players.values())
-                if (!pl.isMurderer()){
-                    Player p = pl.getPlayer();
-                    packet.x = (int) p.x;
-                    packet.y = (int) p.y;
-                    packet.z = (int) p.z;
-                    break;
-                }
-
-            packet.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
-
-            for (PlayerData pl : players.values())
-                if (pl.isMurderer()) {
-                    pl.getPlayer().getInventory().setItem(2, Item.get(Item.COMPASS, 0, 1)
-                            .setCustomName("§r§bPosledni hrac"), true);
                     pl.getPlayer().dataPacket(packet);
-                    break;
                 }
         }
 
@@ -231,13 +184,12 @@ public class Game {
             packet.z = (int) player.z;
             packet.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
 
-            for (PlayerData pl : players.values()){
-                if (!pl.isMurderer())
+            for (PlayerData pl : players.values())
+                if (!pl.isMurderer()) {
                     pl.getPlayer().getInventory().setItem(2, Item.get(Item.COMPASS, 0, 1)
                             .setCustomName("§r§bLuk detektiva"), true);
-
-                pl.getPlayer().dataPacket(packet);
-            }
+                    pl.getPlayer().dataPacket(packet);
+                }
         }
 
         base.getServer().getDefaultLevel().addSound(player, Sound.GAME_PLAYER_ATTACK_NODAMAGE);
@@ -246,29 +198,6 @@ public class Game {
         player.getInventory().clearAll();
         player.addEffect(Effect.getEffect(Effect.BLINDNESS).setAmbient(true).setVisible(false).setDuration(50));
         player.setGamemode(3);
-
-        //poslední nevinný
-        if (getLivingPlayerCount() == 1){
-            SetSpawnPositionPacket packet = new SetSpawnPositionPacket();
-            for (PlayerData pl : players.values())
-                if (!pl.isMurderer()){
-                    Player p = pl.getPlayer();
-                    packet.x = (int) p.x;
-                    packet.y = (int) p.y;
-                    packet.z = (int) p.z;
-                    break;
-                }
-
-            packet.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
-
-            for (PlayerData pl : players.values())
-                if (pl.isMurderer()) {
-                    pl.getPlayer().getInventory().setItem(2, Item.get(Item.COMPASS, 0, 1)
-                            .setCustomName("§r§bPosledni hrac"), true);
-                    pl.getPlayer().dataPacket(packet);
-                    break;
-                }
-        }
 
         //vrah vyhrál
         if (getLivingPlayerCount() == 0) {

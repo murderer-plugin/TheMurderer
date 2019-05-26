@@ -58,9 +58,13 @@ public class GameListener implements Listener {
     }
 
     @EventHandler
-    public void onMove(PlayerMoveEvent e){
-        e.getPlayer().getFoodData().sendFoodLevel(20);
+    public void onSprint(PlayerFoodLevelChangeEvent e){
+        e.setFoodLevel(20);
+        e.setFoodSaturationLevel(100f);
+    }
 
+    @EventHandler
+    public void onMove(PlayerMoveEvent e){
         if (game.getTask().getPhase() == GameSchedule.PHASE_WAITING && (e.getFrom().getX() !=
                 e.getTo().getX() || e.getFrom().getZ() != e.getTo().getZ()))
             e.setCancelled();
