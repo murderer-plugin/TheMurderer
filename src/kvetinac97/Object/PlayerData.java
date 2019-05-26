@@ -37,7 +37,7 @@ public class PlayerData {
         display.addLine("Role: " + (isMurderer() ? "§cVrah" : (isDetective() ? "§1Detektiv" : "§aNevinny")), 5);
         display.addLine("  ", 4);
         eidAlive = display.addLine("§fNevinni: §e" + playersAlive, 3);
-        eidTime = display.addLine("§fCas: §e09:59", 2);
+        eidTime = display.addLine("§fCas: §e10:00", 2);
         display.addLine("   ", 1);
         eidDetective = display.addLine("§fDetektiv: §aNazivu ", 0);
 

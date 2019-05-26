@@ -124,6 +124,7 @@ public class Game {
 
         if (pd.isMurderer()){
             messageAllPlayers("§4Vrah byl zabit!\n" +
+                    "§bVrah§7: §e" + player.getName() + "\n" +
                     "§aNevinni §ba §1Detektiv §bvitezi!");
             endGame();
         }
@@ -153,6 +154,7 @@ public class Game {
         //vrah vyhrál
         if (getLivingPlayerCount() == 0) {
             messageAllPlayers("§bVsichni hraci byli zabiti!\n" +
+                    "§bVrah§7: §e" + player.getName() + "\n" +
                     "§4Vrah §evyhrava hru.");
             endGame();
         }
@@ -166,7 +168,8 @@ public class Game {
 
         if (pd.isMurderer()){
             messageAllPlayers("§4Vrah byl zabit!\n" +
-                   (killer == null ? "" : "§bHrdina: §e" + killer.getName() + "\n") +
+                    "§bVrah§7: §e" + player.getName() + "\n" +
+                    (killer == null ? "" : "§bHrdina: §e" + killer.getName() + "\n") +
                     "§aNevinni §ea §1Detektiv §evitezi!");
             endGame();
         }
@@ -202,6 +205,7 @@ public class Game {
         //vrah vyhrál
         if (getLivingPlayerCount() == 0) {
             messageAllPlayers("§bVsichni hraci byli zabiti!\n" +
+                    "§bVrah§7: §e" + player.getName() + "\n" +
                     "§4Vrah §evyhrava hru.");
             endGame();
         }

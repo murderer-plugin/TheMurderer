@@ -169,11 +169,11 @@ public class GameListener implements Listener {
 
         if (item.getId() == Item.GOLD_INGOT){
             e.setCancelled();
+            e.getItem().close();
 
             if (pl.isMurderer())
                 return;
 
-            e.getItem().close();
             Item gold = player.getInventory().getItem(8);
 
             Item bow = Item.get(Item.BOW);
