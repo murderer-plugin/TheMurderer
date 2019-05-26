@@ -177,7 +177,6 @@ public class GameListener implements Listener {
             Item gold = player.getInventory().getItem(8);
 
             Item bow = Item.get(Item.BOW);
-            bow.addEnchantment(Enchantment.getEnchantment(Enchantment.ID_BOW_INFINITY));
             bow.addEnchantment(Enchantment.getEnchantment(Enchantment.ID_DURABILITY).setLevel(30));
 
             if (gold.getCount() == 9){
