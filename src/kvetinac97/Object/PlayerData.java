@@ -73,6 +73,9 @@ public class PlayerData {
     public void msg(String message){
         player.sendMessage("§0[§7The §cMurderer§0] §f" + message);
     }
+    public void title(String title, String subtitle){
+        player.sendTitle(title, subtitle);
+    }
 
     public boolean isMurderer() {
         return murderer;

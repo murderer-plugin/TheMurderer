@@ -29,6 +29,13 @@ public class GameSchedule extends Task {
             case PHASE_WAITING:
                 if (game.getLivingPlayerCount() >= 2)
                     time--;
+                else
+                    game.getPlayers().forEach((name, pl) -> {
+                        pl.getPlayer().sendPopup("§7Cekani na hrace...");
+                    });
+
+                if (time > 10 && game.getLivingPlayerCount() >= 4) //zrychlení hry
+                    time = 10;
 
                 game.getPlayers().forEach((name, pl) -> {
                     Player player = pl.getPlayer();
@@ -78,8 +85,8 @@ public class GameSchedule extends Task {
             case PHASE_ENDING:
                 time--;
 
-                game.getPlayers().forEach((name, pl) -> {
-                    Player player = pl.getPlayer();
+                game.getBase().getServer().getOnlinePlayers().values().forEach(player -> {
+                    player.sendPopup("§7Hra konci za §e" + time + " §7sekund");
                     player.sendExperienceLevel(time);
                     player.setAttribute(Attribute.getAttribute(Attribute.EXPERIENCE).setValue(time / 10f));
                 });

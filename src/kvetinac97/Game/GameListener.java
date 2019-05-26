@@ -49,8 +49,12 @@ public class GameListener implements Listener {
         Player p = e.getPlayer();
         PlayerData pd = game.getPlayerData(p);
 
+        String prefix = "";
+        if (p.getName().equals("kvetinac97"))
+            prefix = "§0[§4You§fTube§0] ";
+
         for (PlayerData playerData : game.getPlayers().values())
-            playerData.getPlayer().sendMessage("§e" + p.getName() + " §7> §f" + e.getMessage());
+            playerData.getPlayer().sendMessage(prefix + "§e" + p.getName() + " §7> §f" + e.getMessage());
     }
 
     @EventHandler
@@ -67,8 +71,8 @@ public class GameListener implements Listener {
         Player player = e.getPlayer();
 
         if (game.getTask().getPhase() == GameSchedule.PHASE_WAITING)
-            e.setQuitMessage("§0[§7The §cMurderer§0] §e" + player.getName() + " §bse odpojil (" +
-                (game.getPlayers().size() - 1) + "/16).");
+            e.setQuitMessage("§0[§7The §cMurderer§0] §e" + player.getName() + " §bse odpojil §7(" +
+                (game.getPlayers().size() - 1) + "/16)§b.");
         else
             e.setQuitMessage("");
 

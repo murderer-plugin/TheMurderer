@@ -53,8 +53,7 @@ public class Game {
         PlayerData murderer = pls.get(i);
         pls.remove(i);
 
-        murderer.msg("§bJsi §cVrah§b.\n" +
-                "§bZabij vsechny hrace!");
+        murderer.title("§bJsi §cVrah", "§6Zabij vsechny hrace!");
         murderer.setMurderer();
 
         int ix = r.nextInt(pls.size());
@@ -71,16 +70,37 @@ public class Game {
         player.getInventory().setItem(1, bow, true);
         player.getInventory().setItem(23, Item.get(Item.ARROW), true);
 
-        detective.msg("§bJsi §1Detektiv§b.\n" +
-                "§bZachran nevinne pred vrahem!");
+        detective.title("§bJsi §1Detektiv", "§6Zachran nevinne pred vrahem!");
         detective.setDetective();
 
         pls.forEach((pl -> {
-            pl.msg("§bJsi §aNevinny§b.\n" +
-                 "§bSbirej goldy, ziskej luk a zabij vraha!");
+            pl.title("§bJsi §aNevinny", "§6Sbirej goldy pro zisk luku!");
         }));
 
         players.values().forEach(px -> px.showScoreboard(getLivingPlayerCount()));
+
+        //Kompas pro vraha
+        if (getLivingPlayerCount() == 1){
+            SetSpawnPositionPacket packet = new SetSpawnPositionPacket();
+            for (PlayerData pl : players.values())
+                if (!pl.isMurderer()){
+                    Player p = pl.getPlayer();
+                    packet.x = (int) p.x;
+                    packet.y = (int) p.y;
+                    packet.z = (int) p.z;
+                    break;
+                }
+
+            packet.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
+
+            for (PlayerData pl : players.values())
+                if (pl.isMurderer()) {
+                    pl.getPlayer().getInventory().setItem(2, Item.get(Item.COMPASS, 0, 1)
+                            .setCustomName("§r§bPosledni hrac"), true);
+                    pl.getPlayer().dataPacket(packet);
+                    break;
+                }
+        }
     }
 
     //Konec hry
@@ -91,7 +111,7 @@ public class Game {
 
         for (Player player : base.getServer().getOnlinePlayers().values()){
             player.setGamemode(2);
-            messageAllPlayers("§e" + player.getName() + " §bse pripojil (" + (getPlayers().size() + 1) + "/16).");
+            messageAllPlayers("§e" + player.getName() + " §bse pripojil §7(" + (getPlayers().size() + 1) + "/16)§b.");
             joinPlayer(player);
         }
     }
@@ -132,8 +152,8 @@ public class Game {
         }
 
         if (pd.isDetective() || pd.isFakeDetective()){
-            if (pd.isDetective())
-                messageAllPlayers("§4Detektiv byl zabit!");
+            titleAllPlayers(pd.isDetective() ? "§4Detektiv byl zabit" : "",
+                    getLivingPlayerCount() > 1 ? "§6Najdi luk pomoci kompasu" : "");
 
             Item bow = Item.get(Item.BOW, 0, 1);
             bow.addEnchantment(Enchantment.getEnchantment(Enchantment.ID_BOW_INFINITY));
@@ -154,10 +174,33 @@ public class Game {
             }
         }
 
-        //poslední hráč
-        if (getLivingPlayerCount() == 1) {
+        //poslední nevinný
+        if (getLivingPlayerCount() == 1){
+            SetSpawnPositionPacket packet = new SetSpawnPositionPacket();
+            for (PlayerData pl : players.values())
+                if (!pl.isMurderer()){
+                    Player p = pl.getPlayer();
+                    packet.x = (int) p.x;
+                    packet.y = (int) p.y;
+                    packet.z = (int) p.z;
+                    break;
+                }
+
+            packet.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
+
+            for (PlayerData pl : players.values())
+                if (pl.isMurderer()) {
+                    pl.getPlayer().getInventory().setItem(2, Item.get(Item.COMPASS, 0, 1)
+                            .setCustomName("§r§bPosledni hrac"), true);
+                    pl.getPlayer().dataPacket(packet);
+                    break;
+                }
+        }
+
+        //vrah vyhrál
+        if (getLivingPlayerCount() == 0) {
             messageAllPlayers("§bVsichni hraci byli zabiti!\n" +
-                    "§4Vrah §bvyhrava hru.");
+                    "§4Vrah §evyhrava hru.");
             endGame();
         }
     }
@@ -171,13 +214,12 @@ public class Game {
         if (pd.isMurderer()){
             messageAllPlayers("§4Vrah byl zabit!\n" +
                    (killer == null ? "" : "§bHrdina: §e" + killer.getName() + "\n") +
-                    "§aNevinni §ba §1Detektiv §bvitezi!");
+                    "§aNevinni §ea §1Detektiv §evitezi!");
             endGame();
         }
 
         if (pd.isDetective() || pd.isFakeDetective()){
-            if (pd.isDetective())
-                messageAllPlayers("§4Detektiv byl zabit!");
+            titleAllPlayers(pd.isDetective() ? "§4Detektiv byl zabit" : "", "§6Najdi luk pomoci kompasu");
 
             Item bow = Item.get(Item.BOW, 0, 1);
             bow.addEnchantment(Enchantment.getEnchantment(Enchantment.ID_BOW_INFINITY));
@@ -200,14 +242,38 @@ public class Game {
 
         base.getServer().getDefaultLevel().addSound(player, Sound.GAME_PLAYER_ATTACK_NODAMAGE);
 
-        pd.msg("§cByl jsi zabit!");
+        pd.title("§cByl jsi zabit!", "");
         player.getInventory().clearAll();
         player.addEffect(Effect.getEffect(Effect.BLINDNESS).setAmbient(true).setVisible(false).setDuration(50));
         player.setGamemode(3);
 
+        //poslední nevinný
+        if (getLivingPlayerCount() == 1){
+            SetSpawnPositionPacket packet = new SetSpawnPositionPacket();
+            for (PlayerData pl : players.values())
+                if (!pl.isMurderer()){
+                    Player p = pl.getPlayer();
+                    packet.x = (int) p.x;
+                    packet.y = (int) p.y;
+                    packet.z = (int) p.z;
+                    break;
+                }
+
+            packet.spawnType = SetSpawnPositionPacket.TYPE_WORLD_SPAWN;
+
+            for (PlayerData pl : players.values())
+                if (pl.isMurderer()) {
+                    pl.getPlayer().getInventory().setItem(2, Item.get(Item.COMPASS, 0, 1)
+                            .setCustomName("§r§bPosledni hrac"), true);
+                    pl.getPlayer().dataPacket(packet);
+                    break;
+                }
+        }
+
+        //vrah vyhrál
         if (getLivingPlayerCount() == 0) {
             messageAllPlayers("§bVsichni hraci byli zabiti!\n" +
-                    "§4Vrah §bvyhrava hru.");
+                    "§4Vrah §evyhrava hru.");
             endGame();
         }
     }
@@ -231,6 +297,10 @@ public class Game {
         for (PlayerData pd : players.values()){
             pd.msg("§b" + message);
         }
+    }
+    public void titleAllPlayers(String title, String subtitle){
+        for (PlayerData pd : players.values())
+            pd.title(title, subtitle);
     }
 
     public void updateScoreboard(){
