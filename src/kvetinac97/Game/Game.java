@@ -154,7 +154,6 @@ public class Game {
         //vrah vyhrál
         if (getLivingPlayerCount() == 0) {
             messageAllPlayers("§bVsichni hraci byli zabiti!\n" +
-                    "§bVrah§7: §e" + player.getName() + "\n" +
                     "§4Vrah §evyhrava hru.");
             endGame();
         }
@@ -205,7 +204,7 @@ public class Game {
         //vrah vyhrál
         if (getLivingPlayerCount() == 0) {
             messageAllPlayers("§bVsichni hraci byli zabiti!\n" +
-                    "§bVrah§7: §e" + player.getName() + "\n" +
+                    (killer != null ? ("§bVrah§7: §e" + killer.getName() + "\n") : "") +
                     "§4Vrah §evyhrava hru.");
             endGame();
         }
