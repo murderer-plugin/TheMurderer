@@ -1,4 +1,5 @@
 name: MinigameBase
 api: [1.0.0]
+load: POSTWORLD
 version: 1.0.0
 main: kvetinac97.MinigameBase

@@ -73,7 +73,7 @@ public class GameSchedule extends Task {
                 }
 
                 if (time % 30 == 0 && time != 600){
-                    MinigameBase.goldPlayerPos.forEach((pos -> {
+                    MinigameBase.goldPlayerPos.get(game.getMapName()).forEach((pos -> {
                         game.getBase().getServer().getDefaultLevel().dropItem(pos, Item.get(Item.GOLD_INGOT, 0, 1));
                     }));
                 }

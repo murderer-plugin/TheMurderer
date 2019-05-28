@@ -119,6 +119,9 @@ public class GameListener implements Listener {
                     .equals(damager.getName().toLowerCase()))
                 game.diePlayer(damager, damager);
         }
+        else { //spadnutí do lávy nebo do voidu
+            game.diePlayer(player, null);
+        }
     }
 
     @EventHandler

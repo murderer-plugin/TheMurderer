@@ -7,22 +7,23 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.Position;
 import cn.nukkit.level.Sound;
+import cn.nukkit.nbt.tag.*;
 import cn.nukkit.network.protocol.SetSpawnPositionPacket;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.potion.Effect;
 import kvetinac97.MinigameBase;
+import kvetinac97.Object.HumanNPC;
 import kvetinac97.Object.PlayerData;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Random;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class Game {
 
     //Base & Task & Listener
     private PluginBase base;
     private GameSchedule task;
+    private String mapName;
 
     //Players
     private HashMap<String, PlayerData> players = new HashMap<>();
@@ -35,7 +36,11 @@ public class Game {
         base.getServer().getScheduler().scheduleRepeatingTask(task, 20);
         base.getServer().getPluginManager().registerEvents(new GameListener(this), base);
 
-        positionsToDistribute.addAll(MinigameBase.goldPlayerPos);
+        //Náhodný výběr mapy
+        String[] maps = new String[]{"archives", "headquarters", "library", "towerfall", "transport"};
+        mapName = maps[(new Random()).nextInt(maps.length)];
+
+        positionsToDistribute.addAll(MinigameBase.goldPlayerPos.get(mapName));
         Collections.shuffle(positionsToDistribute);
 
         base.getLogger().info("Game registered!");
@@ -83,7 +88,13 @@ public class Game {
     //Konec hry
     public void resetGame(){
         positionsToDistribute.clear();
-        positionsToDistribute.addAll(MinigameBase.goldPlayerPos);
+
+        //Náhodný výběr mapy
+        List<String> maps = Arrays.asList("archives", "headquarters", "library", "towerfall", "transport");
+        maps.remove(mapName); //neopakujeme stejnou mapu
+        mapName = maps.get((new Random()).nextInt(maps.size()));
+
+        positionsToDistribute.addAll(MinigameBase.goldPlayerPos.get(mapName));
         Collections.shuffle(positionsToDistribute);
 
         for (Player player : base.getServer().getOnlinePlayers().values()){
@@ -151,6 +162,8 @@ public class Game {
                 }
         }
 
+        spawnDeadBody(player);
+
         //vrah vyhrál
         if (getLivingPlayerCount() == 0) {
             messageAllPlayers("§bVsichni hraci byli zabiti!\n" +
@@ -200,6 +213,7 @@ public class Game {
         player.getInventory().clearAll();
         player.addEffect(Effect.getEffect(Effect.BLINDNESS).setAmbient(true).setVisible(false).setDuration(50));
         player.setGamemode(3);
+        spawnDeadBody(player);
 
         //vrah vyhrál
         if (getLivingPlayerCount() == 0) {
@@ -219,9 +233,41 @@ public class Game {
         players.clear();
 
         for (Entity entity : base.getServer().getDefaultLevel().getEntities()){
-            if (entity instanceof EntityItem) //odstranění goldů a luku
+            if (entity instanceof EntityItem || entity instanceof HumanNPC) //odstranění goldů, luku a mrtvol
                 entity.kill();
         }
+    }
+
+    //Mrtvola
+    private void spawnDeadBody(Player player){
+        CompoundTag nbt = new CompoundTag()
+            .putList(new ListTag<>("Pos")
+                    .add(new DoubleTag("", player.x))
+                    .add(new DoubleTag("", player.y))
+                    .add(new DoubleTag("", player.z)))
+            .putList(new ListTag<DoubleTag>("Motion")
+                    .add(new DoubleTag("", 0))
+                    .add(new DoubleTag("", 0))
+                    .add(new DoubleTag("", 0)))
+            .putList(new ListTag<FloatTag>("Rotation")
+                    .add(new FloatTag("", (float) player.getYaw()))
+                    .add(new FloatTag("", (float) player.getPitch())))
+            .putBoolean("Invulnerable", true)
+            .putString("NameTag", "")
+            .putFloat("scale", 1);
+
+        nbt.putCompound("Skin", new CompoundTag()
+                .putString("ModelId", player.getSkin().getGeometryName())
+                .putByteArray("Data", player.getSkin().getSkinData())
+                .putString("ModelId", player.getSkin().getSkinId())
+                .putByteArray("CapeData", player.getSkin().getCapeData())
+                .putString("GeometryName", player.getSkin().getGeometryName())
+                .putByteArray("GeometryData", player.getSkin().getGeometryData().getBytes(StandardCharsets.UTF_8))
+        );
+
+        Entity ent = Entity.createEntity("HumanNPC", player.getChunk(), nbt);
+        ent.setNameTag("");
+        ent.spawnToAll();
     }
 
     //Zpráva všem hráčům
@@ -252,6 +298,10 @@ public class Game {
     public HashMap<String, PlayerData> getPlayers() {
         return players;
     }
+    public String getMapName() {
+        return mapName;
+    }
+
     public GameSchedule getTask() {
         return task;
     }
