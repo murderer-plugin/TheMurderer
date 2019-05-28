@@ -90,8 +90,12 @@ public class Game {
         positionsToDistribute.clear();
 
         //Náhodný výběr mapy
-        List<String> maps = Arrays.asList("archives", "headquarters", "library", "towerfall", "transport");
-        maps.remove(mapName); //neopakujeme stejnou mapu
+        ArrayList<String> maps = new ArrayList<>();
+
+        for (String map : new String[]{"archives", "headquarters", "library", "towerfall", "transport"})
+            if (!map.equals(mapName))
+                maps.add(map);
+
         mapName = maps.get((new Random()).nextInt(maps.size()));
 
         positionsToDistribute.addAll(MinigameBase.goldPlayerPos.get(mapName));
@@ -113,6 +117,10 @@ public class Game {
             public void run() {
                 player.teleport(positionsToDistribute.get(0));
                 positionsToDistribute.remove(0);
+
+                player.getLevel().setTime(0);
+                player.getLevel().stopTime();
+                player.getLevel().setRaining(false);
             }
         }, 10);
 
