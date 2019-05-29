@@ -30,6 +30,11 @@ public class GameListener implements Listener {
             e.setCancelled();
             e.setKickMessage("§0[§7The §cMurderer§0] §4Hra již začala!");
         }
+
+        if (game.getPlayers().size() > 16){
+            e.setCancelled();
+            e.setKickMessage("§0[§7The §cMurderer§0] §4Server je plny!");
+        }
     }
 
     @EventHandler

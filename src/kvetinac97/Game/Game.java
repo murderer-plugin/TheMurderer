@@ -111,6 +111,10 @@ public class Game {
     //Připojení hráče
     public void joinPlayer(Player player){
         PlayerData pd = new PlayerData(player);
+        if (positionsToDistribute.size() < 1){
+            player.kick("§0[§7The §cMurderer§0] §4Server je plny!");
+            return;
+        }
 
         base.getServer().getScheduler().scheduleDelayedTask(base, new Runnable() {
             @Override
@@ -137,6 +141,9 @@ public class Game {
 
         //Pouhé odpojení na začátku nebo konci hry
         if (task.getPhase() != GameSchedule.PHASE_GAME){
+            if (task.getPhase() == GameSchedule.PHASE_WAITING) //znovuvrácení hráčova místa
+                positionsToDistribute.add(player.getPosition());
+
             players.remove(player.getName().toLowerCase());
             return;
         }
